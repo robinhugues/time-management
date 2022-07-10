@@ -2,12 +2,17 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ScheduleTypeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ScheduleTypeRepository::class)]
+#[ApiResource(
+    normalizationContext:['groups' => ['schedule-type', 'timestamps']],
+    denormalizationContext:['groups' => 'schedule-type:write']
+)]
 class ScheduleType
 {
     #[ORM\Id]

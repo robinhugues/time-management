@@ -1,0 +1,55 @@
+api_platform:
+  path_segment_name_generator: api_platform.path_segment_name_generator.dash
+  allow_plain_identifiers: true
+
+  defaults:
+    pagination_client_enabled: true
+    pagination_items_per_page: 10
+    pagination_client_items_per_page: true
+    pagination_maximum_items_per_page: 100
+
+  eager_loading:
+    max_joins: 100
+
+  collection:
+    pagination:
+      items_per_page_parameter_name: per_page
+      enabled_parameter_name: pagination
+
+  mapping:
+    paths:
+      - '%kernel.project_dir%/src/Entity'
+
+  patch_formats:
+    json: ['application/merge-patch+json']
+
+  swagger:
+    versions: [3]
+    api_keys:
+      apiKey:
+        name: Authorization
+        type: header
+
+  exception_to_status:
+    # The 4 following handlers are registered by default, keep those lines to prevent unexpected side effects
+    Symfony\Component\Serializer\Exception\ExceptionInterface: 400 # Use a raw status code (recommended)
+    ApiPlatform\Core\Exception\InvalidArgumentException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_BAD_REQUEST
+    ApiPlatform\Core\Exception\FilterValidationException: 400
+    Doctrine\ORM\OptimisticLockException: 409
+
+    # Validation exception
+    ApiPlatform\Core\Bridge\Symfony\Validator\Exception\ValidationException: !php/const Symfony\Component\HttpFoundation\Response::HTTP_UNPROCESSABLE_ENTITY
+
+    # Transition failed execption
+    Symfony\Component\Workflow\Exception\TransitionException: 409
+
+  formats:
+    jsonld: ['application/ld+json']
+    jsonhal: ['application/hal+json']
+    jsonapi: ['application/vnd.api+json']
+    json: ['application/json']
+    xml: ['application/xml', 'text/xml']
+    yaml: ['application/x-yaml']
+    csv: ['text/csv']
+    html: ['text/html']
+    pdf: ['application/pdf']

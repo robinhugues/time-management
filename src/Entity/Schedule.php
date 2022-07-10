@@ -2,10 +2,15 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Core\Annotation\ApiResource;
 use App\Repository\ScheduleRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
+#[ApiResource(
+    normalizationContext:['groups' => ['schedule', 'timestamps']],
+    denormalizationContext:['groups' => 'schedule:write']
+)]
 class Schedule
 {
     use \App\Support\Traits\EntityTimestampable; 
