@@ -2,15 +2,25 @@
 
 namespace App\Entity;
 
-use ApiPlatform\Core\Annotation\ApiResource;
+
 use App\Repository\ScheduleRepository;
+use DateTime;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use ApiPlatform\Core\Annotation\ApiFilter;
+use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\DateFilter;
 
 #[ORM\Entity(repositoryClass: ScheduleRepository::class)]
 #[ApiResource(
     normalizationContext:['groups' => ['schedule', 'timestamps']],
-    denormalizationContext:['groups' => 'schedule:write']
+    denormalizationContext:['groups' => 'schedule:write'],
+    order: ['updatedAt' => 'DESC']
 )]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'exact', 'priority' => 'exact'])]
+#[ApiFilter(DateFilter::class, properties:['startDateTime', 'endDateTime', 'updatedAt', 'createdAt'])]
 class Schedule
 {
     use \App\Support\Traits\EntityTimestampable; 
@@ -19,26 +29,40 @@ class Schedule
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['schedule'])]
     private $id;
 
     #[ORM\Column(type: 'string', length: 255)]
+    #[Groups(['schedule', 'schedule:write'])]
     private $name;
 
     #[ORM\Column(type: 'text')]
+    #[Groups(['schedule', 'schedule:write'])]
     private $comment;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['schedule', 'schedule:write'])]
     private $startDateTime;
 
     #[ORM\Column(type: 'datetime')]
+    #[Groups(['schedule', 'schedule:write'])]
     private $endDateTime;
 
     #[ORM\Column(type: 'integer')]
+    #[Groups(['schedule', 'schedule:write'])]
     private $priority;
 
     #[ORM\ManyToOne(targetEntity: ScheduleType::class, inversedBy: 'schedules')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['schedule', 'schedule:write'])]
     private $scheduleType;
+
+
+    public function __construct()
+    {
+        $this->createdAt = new DateTimeImmutable();
+        $this->updatedAt = new DateTime();
+    }
 
     public function getId(): ?int
     {
